@@ -17,7 +17,12 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import {Avatar, Button, Card, Title, Paragraph} from 'react-native-paper';
 
+import ReactNativeAN from 'react-native-alarm-notification';
+
+const fireDate = ReactNativeAN.parseDate(new Date(Date.now() + 5000)); // set the fire date for 1 second from now
+import DatePicker from './DatePicker';
 import {
   Colors,
   DebugInstructions,
@@ -25,31 +30,20 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+const LeftContent = props => <Avatar.Icon {...props} icon="folder" />;
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+const alarmNotificationData = {
+  title: 'My Notification Title',
+  message: 'My Notification Message',
+  channel: 'my_channel_id',
+  small_icon: 'ic_launcher',
+  has_button: true,
+  use_big_text: true,
+  volume: 1,
+  // You can add any additional data that is important for the notification
+  // It will be added to the PendingIntent along with the rest of the bundle.
+  // e.g.
+  data: {foo: 'bar'},
 };
 
 const App: () => Node = () => {
@@ -59,33 +53,40 @@ const App: () => Node = () => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  React.useEffect(() => {
+    async function initAlarm() {
+      //Schedule Future Alarm
+      const alarm = await ReactNativeAN.scheduleAlarm({
+        ...alarmNotificationData,
+        fire_date: fireDate,
+      });
+      console.log(alarm); // { id: 1 }
+    }
+    // initAlarm();
+  }, []);
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+      <View style={{margin: 5}}>
+        <Card>
+          <Card.Title
+            title="Card Title"
+            subtitle="Card Subtitle"
+            left={LeftContent}
+          />
+          <Card.Content>
+            <Title>Card title</Title>
+            <Paragraph>Card content</Paragraph>
+          </Card.Content>
+          <Card.Cover source={{uri: 'https://picsum.photos/700'}} />
+          <Card.Actions>
+            <Button>Cancel</Button>
+            <Button>Ok</Button>
+          </Card.Actions>
+        </Card>
+        <DatePicker />
+      </View>
     </SafeAreaView>
   );
 };
